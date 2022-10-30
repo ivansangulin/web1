@@ -62,29 +62,33 @@
     button.addEventListener('click', function(event) {
         var newhometeamgoals = homegoalsinput.value;
         var newawayteamgoals = awaygoalsinput.value;
-        if(isNaN(newhometeamgoals) || isNaN(newawayteamgoals)) {
-            alert("Goals must be numbers!");
-        } else if(newhometeamgoals < 0 || newawayteamgoals < 0) {
-            alert("Goals can't be negative!");
-        } else if((newhometeamgoals == "" && newawayteamgoals == "") || (newhometeamgoals != "" && newawayteamgoals != "")) {
-            var data = {homegoals:newhometeamgoals,awaygoals:newawayteamgoals,gameid:gameselect.value};
-            fetch("/editscore", {
-                method : 'POST',
-                headers: {
-                    Accept: "application/json",
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify(data),
-            }).then(res => {
-                window.alert("Successfully changed the score!");
-                window.location.reload();
-                console.log("ok");
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        if(gameselect.value == "") {
+            alert("Must choose a game!");
         } else {
-            alert("Both scores should be deleted/added!");
+            if(isNaN(newhometeamgoals) || isNaN(newawayteamgoals)) {
+                alert("Goals must be numbers!");
+            } else if(newhometeamgoals < 0 || newawayteamgoals < 0) {
+                alert("Goals can't be negative!");
+            } else if((newhometeamgoals == "" && newawayteamgoals == "") || (newhometeamgoals != "" && newawayteamgoals != "")) {
+                var data = {homegoals:newhometeamgoals,awaygoals:newawayteamgoals,gameid:gameselect.value};
+                fetch("/editscore", {
+                    method : 'POST',
+                    headers: {
+                        Accept: "application/json",
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify(data),
+                }).then(res => {
+                    window.alert("Successfully changed the score!");
+                    window.location.reload();
+                    console.log("ok");
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            } else {
+                alert("Both scores should be deleted/added!");
+            }
         }
     })
 </script>
