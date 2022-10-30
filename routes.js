@@ -167,7 +167,7 @@ app.post("/editscore", function(req,res) {
                     matchdaysData[i].awaygoals = req.body.awaygoals;
                     clubs.sort(function(a,b) {
                         if(a.points == b.points) {
-                            return b.pointsdifference - a.pointsdifference;
+                            return (b.goaldifference) - (a.goaldifference);
                         }
                         return b.points - a.points;
                     })
