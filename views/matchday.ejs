@@ -9,6 +9,9 @@
             <a href="/editgames">Edit games</a>
         <% } %>
     <% } %>
+    <% if(user != "") { %>
+        <div>Logged in as <%=user%></div>
+    <% } %>
 </header>
 <body>
     <div id="matchday">

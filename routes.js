@@ -24,8 +24,10 @@ app.get(["/","/table"], (req,res) => {
     var admin = (JSON.parse(fs.readFileSync('admin.json'))).admin;
     var isAdmin = false;
     var auth = false;
+    var user = "";
     if(req.oidc.isAuthenticated()) {
         auth = true;
+        user = req.oidc.user.name;
         if(req.oidc.user.name == admin) {
             isAdmin = true;
         }
@@ -36,7 +38,7 @@ app.get(["/","/table"], (req,res) => {
             res.render("Error occured")
         } else {
             const clubsData = JSON.parse(data);
-            res.render('table.ejs', {clubs: clubsData.clubs, loggedin:auth, admin:isAdmin});
+            res.render('table.ejs', {clubs: clubsData.clubs, loggedin:auth, admin:isAdmin, user:user});
         }
     })
 })
@@ -45,8 +47,10 @@ app.get("/matchdays",   (req,res) => {
     var admin = (JSON.parse(fs.readFileSync('admin.json'))).admin;
     var isAdmin = false;
     var auth = false;
+    var user = "";
     if(req.oidc.isAuthenticated()) {
         auth = true;
+        user = req.oidc.user.name;
         if(req.oidc.user.name == admin) {
             isAdmin = true;
         }
@@ -57,13 +61,14 @@ app.get("/matchdays",   (req,res) => {
             res.render("Error occured")
         } else {
             const matchdaysData = JSON.parse(data);
-            res.render('matchdays.ejs', {matchdays: matchdaysData.matchdays, loggedin: auth,admin:isAdmin});
+            res.render('matchdays.ejs', {matchdays: matchdaysData.matchdays, loggedin: auth,admin:isAdmin,user:user});
         }
     })
 })
 
 app.get("/editgames",bodyParser.json(), (req,res) => {
     var admin = (JSON.parse(fs.readFileSync('admin.json'))).admin;
+    var user = "";
     if(req.oidc.isAuthenticated()) {
         if(req.oidc.user.name != admin) {
             res.redirect("/");
@@ -71,13 +76,14 @@ app.get("/editgames",bodyParser.json(), (req,res) => {
     } else {
         res.redirect("/");
     }
+        user = req.oidc.user.name;
         fs.readFile('matchdays.json', 'utf-8', function(err,data) {
             if(err) {
                 console.log(err);
                 res.render("Error occured");
             } else {
                 const matchdaysData = JSON.parse(data);
-                res.render('editgames.ejs', {matchdays: matchdaysData.matchdays, loggedin: true, admin:true});
+                res.render('editgames.ejs', {matchdays: matchdaysData.matchdays, loggedin: true, admin:true,user:user});
             }
         })
 })
