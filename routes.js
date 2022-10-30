@@ -3,17 +3,18 @@ const path = require("path");
 const fs = require("fs");
 const bodyParser = require('body-parser');
 const app = express();
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
 const { auth, requiresAuth } = require('express-openid-connect');
 require("dotenv").config();
 app.set('view engine', 'ejs');
 //app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-const port = 3000
+const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 3000;
 const config = {
     authRequired: false,
     auth0Logout: true,
     secret: process.env.SECRET,
-    baseURL: 'http://localhost:3000',
+    baseURL: externalUrl || 'http://localhost:3000',
     clientID: process.env.CLIENTID,
     issuerBaseURL: 'https://dev-gtlzfsa5q48c5kb0.us.auth0.com'
   };
