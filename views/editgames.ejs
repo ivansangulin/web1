@@ -1,0 +1,90 @@
+<header>
+    <a href="/">Home page</a>
+    <a href="/matchdays">Matchdays</a>
+    <a href="/logout">Logout</a>
+    <a href="/editgames">Edit games</a>
+</header>
+<body>
+    <div id="editgames">
+        <label for="matchday-select">Choose matchday:</label>
+        <select id="matchday-select">
+            <option value="" selected disabled>--</option>
+            <% for (var i = 0; i < 36; i++) { %>
+                <option value="<%=i+1 %>" class="matchday"><%= "Matchday " + (i+1)%></option>
+            <% } %>
+        </select>
+        <label for="game-select">Choose game:</label>
+        <select id="game-select">
+            <option value="" selected class="defaultgamevalue">--</option>
+        </select>
+        <label for="homegoalsinput">Input home team goals:</label>
+        <input id="homegoalsinput" type="text"></input>
+        <label for="awaygoalsinput">Input away team goals:</label>
+        <input id="awaygoalsinput" type="text"></input>
+        <button id="changescore">Change the score</button>
+    </div>
+</body>
+<script>
+    var matchdayselect = document.getElementById("matchday-select");
+    var gameselect = document.querySelector("#game-select");
+    var button = document.getElementById("changescore");
+    var homegoalsinput = document.getElementById("homegoalsinput");
+    var awaygoalsinput = document.getElementById("awaygoalsinput");
+    gameselect.disabled = true;
+    homegoalsinput.value = "";
+    awaygoalsinput.value = "";
+    matchdayselect.addEventListener('change', function(event) {
+        gameselect.disabled = false;
+        document.getElementById("homegoalsinput").value = '';
+        document.getElementById("awaygoalsinput").value = '';
+        document.querySelector(".defaultgamevalue").style.display = 'none';
+        document.querySelectorAll(".game").forEach(function(game) {
+            game.remove();
+        });
+        '<% matchdays.forEach(function(matchday) {%>'
+            if('<%=matchday.matchday%>' == event.target.value) {
+                var element = document.createElement("option");
+                element.className = "game";
+                element.value = '<%=matchday.id%>';
+                element.innerText = '<%=matchday.hometeam + "-" + matchday.awayteam%>';
+                gameselect.append(element);
+            }
+        '<% })%>' 
+    })
+    gameselect.addEventListener('change', function(event) {
+        '<%matchdays.forEach(function(matchday) {%>'
+            if(gameselect.value == '<%=matchday.id%>') {
+                document.getElementById("homegoalsinput").value = '<%=matchday.homegoals%>';
+                document.getElementById("awaygoalsinput").value = '<%=matchday.awaygoals%>';
+            }
+        '<% }) %>'
+    })
+    button.addEventListener('click', function(event) {
+        var newhometeamgoals = homegoalsinput.value;
+        var newawayteamgoals = awaygoalsinput.value;
+        if(isNaN(newhometeamgoals) || isNaN(newawayteamgoals)) {
+            alert("Goals must be numbers!");
+        } else if(newhometeamgoals < 0 || newawayteamgoals < 0) {
+            alert("Goals can't be negative!");
+        } else if((newhometeamgoals == "" && newawayteamgoals == "") || (newhometeamgoals != "" && newawayteamgoals != "")) {
+            var data = {homegoals:newhometeamgoals,awaygoals:newawayteamgoals,gameid:gameselect.value};
+            fetch("/editscore", {
+                method : 'POST',
+                headers: {
+                    Accept: "application/json",
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(data),
+            }).then(res => {
+                window.alert("Successfully changed the score!");
+                window.location.reload();
+                console.log("ok");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        } else {
+            alert("Both scores should be deleted/added!");
+        }
+    })
+</script>

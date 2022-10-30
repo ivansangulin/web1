@@ -1,0 +1,32 @@
+<header>
+    <a href="/">Home page</a>
+    <a href="/matchdays">Matchdays</a>
+    <% if(!loggedin) { %>
+        <a href="/login">Login</a>
+    <% } else { %>
+        <a href="/logout">Logout</a>
+        <% if(admin) {%>
+            <a href="/editgames">Edit games</a>
+        <% } %>
+    <% } %>
+</header>
+<body>
+    <table id="hnltable">
+        <tr>
+            <th>Club name</th>
+            <th>Games played</th>
+            <th>Goal difference</th>
+            <th>Points</th>
+            <% for (var i = 0; i < clubs.length; i++) {%>
+                <tr>
+                    <td><%=(i+1)+ ". " +clubs[i].clubname%></td>
+                    <td><%=clubs[i].gamesplayed%></td>
+                    <td><%=clubs[i].goaldifference%></td>
+                    <td><%=clubs[i].points%></td>
+                </tr>
+            <% } %>
+        </tr>
+    </table>
+</body>
+
+

@@ -1,0 +1,36 @@
+<header>
+    <a href="/">Home page</a>
+    <a href="/matchdays">Matchdays</a>
+    <% if(!loggedin) { %>
+        <a href="/login">Login</a>
+    <% } else { %>
+        <a href="/logout">Logout</a>
+        <% if(admin) {%>
+            <a href="/editgames">Edit games</a>
+        <% } %>
+    <% } %>
+</header>
+<body>
+    <div id="matchdays">
+        <% var matchdaycounter = 1 %>
+        <% for (var i = 0; i < matchdays.length; i++) {%>
+            <% if ((i+1) % 5 == 1) {%>
+                <div name="matchday"><a href="/matchdays/<%=matchdaycounter%>">Matchday <%=matchdaycounter%></a>
+                <% matchdaycounter++ %>
+                <br>
+            <% } %>
+            <div name="game">
+                <div name="teams"><%=matchdays[i].hometeam + " - "  + matchdays[i].awayteam%></div>
+                <% if (matchdays[i].homegoals == "") {%>
+                    <div name="score">To be played</div>
+                <% } else {%>
+                    <div name="score"><%=matchdays[i].homegoals + " : " + matchdays[i].awaygoals%></div>
+                <% } %>
+            </div>
+            <% if ((i+1) % 5 == 0) {%>
+            </div>
+                <br>
+            <% } %>
+        <% } %>
+    </div>
+</body>

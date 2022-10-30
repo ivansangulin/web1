@@ -1,0 +1,141 @@
+<header>
+    <a href="/">Home page</a>
+    <a href="/matchdays">Matchdays</a>
+    <% if(!loggedin) { %>
+        <a href="/login">Login</a>
+    <% } else { %>
+        <a href="/logout">Logout</a>
+        <% if(admin) {%>
+            <a href="/editgames">Edit games</a>
+        <% } %>
+    <% } %>
+</header>
+<body>
+    <div id="matchday">
+        <div name="matchdays"><%= "Matchday " + matchday[0].matchday%>
+        <% for (var i = 0; i < matchday.length; i++) {%>
+            <div name="game">
+                <div name="teams"><%=matchday[i].hometeam + " - "  + matchday[i].awayteam%></div>
+                <% if (matchday[i].homegoals == "") {%>
+                    <div name="score">To be played</div>
+                <% } else {%>
+                    <div name="score"><%=matchday[i].homegoals + " : " + matchday[i].awaygoals%></div>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+    <br>
+    <div id="comments">
+        <div>Comments:</div>
+        <% if(comments.length == 0) { %> 
+            <div>There are no comments yet!</div>
+        <% } else { %>
+            <%for(let j = 0; j < comments.length; j++) {%>
+                <div>
+                    <div id="<%=comments[j].user%>"><%=comments[j].user%> commented:</div>
+                    <div id="<%=comments[j].id%>"><%=comments[j].comment%></div>
+                    <% if(admin) { %>
+                        <button id="deletecomment" class="<%=comments[j].id%>">Delete</button>
+                        <button id="editcomment" class="<%=comments[j].id%>">Edit</button>
+                    <% } else if(user == comments[j].user && !admin) {%>
+                        <button id="deletecomment" class="<%=comments[j].id%>">Delete</button>
+                        <button id="editcomment" class="<%=comments[j].id%>">Edit</button>
+                    <% } %>
+                </div>
+            </br>
+            <% } %>
+        <% } %>
+        <% if(loggedin) { %>
+            <label for="commenttextbox">Add a comment:</label>
+            <br>
+            <textarea id="commenttextbox" value=""></textarea>
+            <br>
+            <button id="commentbutton">Add</button>
+        <% } %>
+    </div>
+</body>
+<script>
+    document.getElementById("commenttextbox").style.resize = "None";
+    document.getElementById("commenttextbox").style.width = "500px";
+    document.getElementById("commenttextbox").style.height = "100px";
+    document.querySelectorAll("#deletecomment").forEach(button => {
+        button.addEventListener('click' ,function(event) {
+            var commentid = event.target.className;
+            fetch("/deletecomment", {
+                method : 'POST',
+                headers: {
+                    Accept: "application/json",
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({commentid:commentid})
+            }).then(res => {
+                alert("Succesfully deleted!")
+                window.location.reload();
+            }).catch(err => { 
+                alert("Something went wrong");
+            })
+        })
+    })
+    document.getElementById("commentbutton").addEventListener('click', function(event) {
+        var comment = document.getElementById("commenttextbox").value;
+        var matchday = "<%=matchday[0].matchday%>";
+        var user = "<%=user%>";
+        var commentid = (parseInt("<%=maxid%>") + 1);
+        var newcomment = {id:commentid,user:user,matchday:matchday,comment:comment};
+        fetch("/addcomment", {
+            method : 'POST',
+            headers: {
+                Accept: "application/json",
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({newcomment:newcomment})
+        }).then(res => {
+            alert("Succesfully added!")
+            window.location.reload();
+        }).catch(err => { 
+            alert("Something went wrong");
+        })
+    })
+    document.querySelectorAll("#editcomment").forEach(button => {
+        button.addEventListener('click', function(event) {
+            var commentidcopy = event.target.className;
+            var parent = document.querySelector("#editcomment","." + event.target.className).closest("div");
+            parent.innerHTML = '';
+            var element = document.createElement("div");
+            element.id = "<%=user%>";
+            element.textContent = element.id + " commented";
+            parent.append(element);
+            element = document.createElement("textarea");
+            element.id = "commenttextbox";
+            element.style.resize = 'None';
+            element.style.width = "500px";
+            element.style.height = "100px";
+            parent.append(element);
+            parent.append(document.createElement("br"))
+            element = document.createElement("button");
+            element.id = commentbutton;
+            element.textContent = "New comment";
+            element.addEventListener("click", function(event) {
+                var comment = document.getElementById("commenttextbox").value;
+                var matchday = "<%=matchday[0].matchday%>";
+                var user = "<%=user%>";
+                var commentid = commentidcopy;
+                var newcomment = {id:commentid,user:user,matchday:matchday,comment:comment};
+                fetch("/editcomment", {
+                    method : 'POST',
+                    headers: {
+                        Accept: "application/json",
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({newcomment:newcomment})
+                }).then(res => {
+                    alert("Succesfully edited!")
+                    window.location.reload();
+                }).catch(err => { 
+                    alert("Something went wrong");
+                })
+            })
+            parent.append(element);
+        })
+    })
+</script>
